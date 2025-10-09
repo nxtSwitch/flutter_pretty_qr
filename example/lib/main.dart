@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
@@ -228,6 +229,8 @@ class _PrettyQrSettings extends StatefulWidget {
   @visibleForTesting
   static const kDefaultQrDecorationImage = PrettyQrDecorationImage(
     image: AssetImage('images/flutter.png'),
+    padding: EdgeInsets.all(8),
+    clipper: PrettyQrFlutterLogoClipper(),
     position: PrettyQrDecorationImagePosition.embedded,
   );
 
@@ -699,5 +702,31 @@ class _PrettyQrSettingsState extends State<_PrettyQrSettings> {
     imageSizeEditingController.dispose();
 
     super.dispose();
+  }
+}
+
+class PrettyQrFlutterLogoClipper implements PrettyQrClipper {
+  const PrettyQrFlutterLogoClipper();
+
+  @override
+  Path getClip(Size size) {
+    final imageSizeTransformMatrix = Float64List(16);
+    imageSizeTransformMatrix[0] = size.width;
+    imageSizeTransformMatrix[5] = size.height;
+    imageSizeTransformMatrix[10] = 1;
+    imageSizeTransformMatrix[15] = 1;
+
+    return (Path()
+          ..moveTo(0.566, 0.001)
+          ..lineTo(0.004, 0.514)
+          ..lineTo(0.525, 1.001)
+          ..lineTo(0.986, 1.001)
+          ..lineTo(0.681, 0.723)
+          ..lineTo(0.986, 0.445)
+          ..lineTo(0.577, 0.445)
+          ..lineTo(0.546, 0.417)
+          ..lineTo(1.004, 0.001)
+          ..close())
+        .transform(imageSizeTransformMatrix);
   }
 }
