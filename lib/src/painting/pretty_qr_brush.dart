@@ -6,7 +6,9 @@ import 'package:flutter/painting.dart';
 
 import 'package:pretty_qr_code/src/painting/extensions/pretty_qr_brush_extensions.dart';
 
+/// {@template pretty_qr_code.painting.PrettyQrBrush}
 /// A brush to use when filling the QR Code.
+/// {@endtemplate}
 @immutable
 abstract class PrettyQrBrush extends Color {
   /// Creates a QR Code brush.

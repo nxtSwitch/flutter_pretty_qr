@@ -1,10 +1,13 @@
 import 'package:meta/meta.dart';
 import 'package:flutter/painting.dart';
 
-import 'package:pretty_qr_code/src/painting/pretty_qr_brush.dart';
-import 'package:pretty_qr_code/src/painting/pretty_qr_shape.dart';
+import 'package:pretty_qr_code/src/base/pretty_qr_version.dart';
+
 import 'package:pretty_qr_code/src/rendering/pretty_qr_painting_context.dart';
 import 'package:pretty_qr_code/src/rendering/pretty_qr_render_capabilities.dart';
+
+import 'package:pretty_qr_code/src/painting/pretty_qr_brush.dart';
+import 'package:pretty_qr_code/src/painting/pretty_qr_shape.dart';
 import 'package:pretty_qr_code/src/painting/extensions/pretty_qr_module_extensions.dart';
 
 /// A rectangular symbol with rounded corners.
@@ -38,6 +41,7 @@ class PrettyQrRoundedSymbol extends PrettyQrShape {
   void paint(PrettyQrPaintingContext context) {
     final path = Path();
     final brush = PrettyQrBrush.from(color);
+    final needsAvoidComplexPaths = _needsAvoidComplexPaths(context);
 
     final paint = brush.toPaint(
       context.estimatedBounds,
@@ -54,7 +58,7 @@ class PrettyQrRoundedSymbol extends PrettyQrShape {
         ..addRRect(radius.toRRect(moduleRect))
         ..close();
 
-      if (PrettyQrRenderCapabilities.needsAvoidComplexPaths) {
+      if (needsAvoidComplexPaths) {
         context.canvas.drawPath(modulePath, paint);
       } else {
         path.addPath(modulePath, Offset.zero);
@@ -63,6 +67,12 @@ class PrettyQrRoundedSymbol extends PrettyQrShape {
 
     path.close();
     context.canvas.drawPath(path, paint);
+  }
+
+  @protected
+  bool _needsAvoidComplexPaths(PrettyQrPaintingContext context) {
+    if (PrettyQrRenderCapabilities.needsAvoidComplexPaths) return true;
+    return context.matrix.version > PrettyQrVersion.version16;
   }
 
   @override

@@ -5,6 +5,8 @@ import 'dart:ui';
 import 'package:meta/meta.dart';
 import 'package:flutter/painting.dart';
 
+import 'package:pretty_qr_code/src/base/pretty_qr_version.dart';
+
 import 'package:pretty_qr_code/src/rendering/pretty_qr_painting_context.dart';
 import 'package:pretty_qr_code/src/rendering/pretty_qr_render_capabilities.dart';
 
@@ -53,6 +55,7 @@ class PrettyQrSquaresSymbol implements PrettyQrShape {
     final matrix = context.matrix;
     final canvasBounds = context.estimatedBounds;
     final moduleDimension = canvasBounds.longestSide / matrix.version.dimension;
+    final needsAvoidComplexPaths = _needsAvoidComplexPaths(context);
 
     final fillPaint = brush.toPaint(
       canvasBounds,
@@ -128,7 +131,7 @@ class PrettyQrSquaresSymbol implements PrettyQrShape {
         Radius.circular(effectiveRadius),
       ).deflate(effectiveDensity);
 
-      if (PrettyQrRenderCapabilities.needsAvoidComplexPaths) {
+      if (needsAvoidComplexPaths) {
         context.canvas.drawRRect(moduleRRect, fillPaint);
       } else {
         path.addRRect(moduleRRect);
@@ -136,6 +139,12 @@ class PrettyQrSquaresSymbol implements PrettyQrShape {
     }
 
     context.canvas.drawPath(path, fillPaint);
+  }
+
+  @protected
+  bool _needsAvoidComplexPaths(PrettyQrPaintingContext context) {
+    if (PrettyQrRenderCapabilities.needsAvoidComplexPaths) return true;
+    return context.matrix.version > PrettyQrVersion.version16;
   }
 
   @override
