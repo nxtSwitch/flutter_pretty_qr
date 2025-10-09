@@ -3,6 +3,9 @@ import 'dart:ui';
 import 'package:meta/meta.dart';
 import 'package:flutter/painting.dart';
 
+import 'package:pretty_qr_code/src/painting/pretty_qr_clipper.dart';
+import 'package:pretty_qr_code/src/painting/clippers/pretty_qr_rectangle_clipper.dart';
+
 /// {@template pretty_qr_code.painting.PrettyQrDecorationImagePosition}
 /// Where to paint a image decoration.
 /// {@endtemplate}
@@ -20,6 +23,14 @@ enum PrettyQrDecorationImagePosition {
 /// An image for a QR decoration.
 @immutable
 class PrettyQrDecorationImage extends DecorationImage {
+  /// The custom clipper fot embedded image.
+  ///
+  /// **Notes:**
+  /// In the HTML renderer these operations were long unimplemented or only
+  /// partially supported, which can cause incorrect clipping. See: https://github.com/flutter/flutter/issues/44572.
+  @nonVirtual
+  final PrettyQrClipper clipper;
+
   /// The padding for the QR image.
   @nonVirtual
   final EdgeInsetsGeometry padding;
@@ -30,7 +41,8 @@ class PrettyQrDecorationImage extends DecorationImage {
   /// Creates an image to show into QR code.
   ///
   /// Not recommended to use scale over `0.2`, see the QR code
-  /// [error correction](https://www.qrcode.com/en/about/error_correction.html) feature.
+  /// [error correction](https://www.qrcode.com/en/about/error_correction.html)
+  /// feature.
   @literal
   const PrettyQrDecorationImage({
     required super.image,
@@ -45,6 +57,7 @@ class PrettyQrDecorationImage extends DecorationImage {
     super.invertColors = false,
     super.isAntiAlias = false,
     this.padding = EdgeInsets.zero,
+    this.clipper = const PrettyQrRectangleClipper(),
     this.position = PrettyQrDecorationImagePosition.embedded,
   }) : assert(scale >= 0 && scale <= 1);
 
@@ -65,6 +78,7 @@ class PrettyQrDecorationImage extends DecorationImage {
     final bool? invertColors,
     final bool? isAntiAlias,
     final EdgeInsetsGeometry? padding,
+    final PrettyQrClipper? clipper,
     final PrettyQrDecorationImagePosition? position,
   }) {
     return PrettyQrDecorationImage(
@@ -80,6 +94,7 @@ class PrettyQrDecorationImage extends DecorationImage {
       invertColors: invertColors ?? this.invertColors,
       isAntiAlias: isAntiAlias ?? this.isAntiAlias,
       padding: padding ?? this.padding,
+      clipper: clipper ?? this.clipper,
       position: position ?? this.position,
     );
   }
@@ -126,7 +141,7 @@ class PrettyQrDecorationImage extends DecorationImage {
 
   @override
   int get hashCode {
-    return super.hashCode ^ Object.hash(runtimeType, padding);
+    return Object.hash(super.hashCode, runtimeType, padding, clipper, position);
   }
 
   @override
@@ -137,6 +152,7 @@ class PrettyQrDecorationImage extends DecorationImage {
     return other is PrettyQrDecorationImage &&
         super == other &&
         other.padding == padding &&
+        other.clipper == clipper &&
         other.position == position;
   }
 }

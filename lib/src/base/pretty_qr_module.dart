@@ -27,6 +27,12 @@ class PrettyQrModule extends Point<int> {
     required this.isDark,
   });
 
+  /// Returns a [PrettyQrModule] position.
+  @pragma('vm:prefer-inline')
+  Point get position {
+    return Point(x, y);
+  }
+
   /// {@macro pretty_qr_code.base.PrettyQrFinderPattern}
   @pragma('vm:prefer-inline')
   bool get isFinderPattern {

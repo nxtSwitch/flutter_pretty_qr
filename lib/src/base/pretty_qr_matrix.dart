@@ -38,8 +38,8 @@ class PrettyQrMatrix extends Iterable<PrettyQrModule> {
   @experimental
   factory PrettyQrMatrix.masked(
     PrettyQrMatrix parent, {
-    Rectangle<int>? clip,
-    Set<PrettyQrComponentType> exclude,
+    Set<Point> excludePoints,
+    Set<PrettyQrComponentType> excludeComponents,
   }) = _PrettyQrMaskedMatrix;
 
   /// Creates a qr matrix from [QrImage].
@@ -194,19 +194,19 @@ class _PrettyQrMaskedMatrix extends PrettyQrMatrix {
   @nonVirtual
   final PrettyQrMatrix parent;
 
-  /// Rectangle defining the clipping area.
+  /// Indicates which modules are excluded from the QR code matrix.
   @nonVirtual
-  final Rectangle<int>? clip;
+  final Set<Point> excludePoints;
 
   /// Indicates which component modules are excluded from the QR code matrix.
   @nonVirtual
-  final Set<PrettyQrComponentType> exclude;
+  final Set<PrettyQrComponentType> excludeComponents;
 
   /// {@macro pretty_qr_code.base.PrettyQrMaskedMatrix}
   _PrettyQrMaskedMatrix(
     this.parent, {
-    this.clip,
-    this.exclude = const {},
+    this.excludePoints = const {},
+    this.excludeComponents = const {},
   }) : super(version: parent.version, modules: parent.modules);
 
   @override
@@ -217,17 +217,19 @@ class _PrettyQrMaskedMatrix extends PrettyQrMatrix {
   @override
   PrettyQrModule? getModuleAt(int x, int y) {
     final module = parent.getModuleAt(x, y);
+
     if (module == null) return module;
+    if (!module.isDark) return module;
 
-    late final exluded = exclude.contains(module.type);
-    late final clipped = clip?.containsPoint(module) ?? false;
+    late final exludedPoints = excludePoints.contains(module.position);
+    late final exludedComponents = excludeComponents.contains(module.type);
 
-    return clipped || exluded ? module.toBlank() : module;
+    return exludedComponents || exludedPoints ? module.toBlank() : module;
   }
 
   @override
   int get hashCode {
-    return Object.hash(parent, clip, exclude);
+    return Object.hash(parent, excludePoints, excludeComponents);
   }
 
   @override
@@ -235,9 +237,12 @@ class _PrettyQrMaskedMatrix extends PrettyQrMatrix {
     if (identical(other, this)) return true;
     if (other is! _PrettyQrMaskedMatrix) return false;
 
-    if (other.clip != clip) return false;
-    for (final type in other.exclude) {
-      if (!exclude.contains(type)) return false;
+    for (final point in other.excludePoints) {
+      if (!excludePoints.contains(point)) return false;
+    }
+
+    for (final components in other.excludeComponents) {
+      if (!excludeComponents.contains(components)) return false;
     }
 
     return parent == other;

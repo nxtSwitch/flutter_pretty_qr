@@ -30,4 +30,8 @@ abstract class PrettyQrRenderCapabilities {
   /// Whether to render nested images when exporting to an image.
   static bool enableExportNestedImage =
       !kIsWeb || capabilities.isCanvasKit || capabilities.isSkwasm;
+
+  /// Whether to clip nested images with custom clipper.
+  static bool enableClipperForNestedImage =
+      !kIsWeb || capabilities.isCanvasKit || capabilities.isSkwasm;
 }

@@ -43,6 +43,12 @@ class PrettyQrPaintingContext {
     return estimatedBounds.width;
   }
 
+  /// Returns QR code single module dimension.
+  @pragma('vm:prefer-inline')
+  double get moduleDimension {
+    return boundsDimension / matrix.dimension;
+  }
+
   /// Creates a copy of this [PrettyQrPaintingContext] but with the given fields
   /// replaced with the new values.
   @factory

@@ -2,14 +2,17 @@ import 'dart:math';
 
 import 'package:meta/meta.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:pretty_qr_code/src/base/pretty_qr_matrix.dart';
 
 import 'package:pretty_qr_code/src/rendering/pretty_qr_painting_context.dart';
+import 'package:pretty_qr_code/src/rendering/pretty_qr_render_capabilities.dart';
 
 import 'package:pretty_qr_code/src/painting/pretty_qr_brush.dart';
 import 'package:pretty_qr_code/src/painting/decoration/pretty_qr_decoration.dart';
 import 'package:pretty_qr_code/src/painting/decoration/pretty_qr_decoration_image.dart';
+import 'package:pretty_qr_code/src/painting/extensions/pretty_qr_module_extensions.dart';
 import 'package:pretty_qr_code/src/painting/extensions/pretty_qr_quiet_zone_extension.dart';
 
 /// A stateful class that can paint a QR code.
@@ -26,6 +29,10 @@ class PrettyQrPainter {
   /// What decoration to paint.
   @nonVirtual
   final PrettyQrDecoration decoration;
+
+  /// The QR code clipped matrix cache.
+  @protected
+  PrettyQrMatrix? _clippedMatrix;
 
   /// The painter for a [PrettyQrDecorationImage].
   @protected
@@ -100,27 +107,90 @@ class PrettyQrPainter {
         decoration.shape.paint(context);
         return;
       case PrettyQrDecorationImagePosition.embedded:
-        final moduleSize = context.boundsDimension / context.matrix.dimension;
-        final clippedMatrix = PrettyQrMatrix.masked(
-          context.matrix,
-          clip: Rectangle.fromPoints(
-            Point(
-              imageCroppedRect.left / moduleSize ~/ 1,
-              imageCroppedRect.top / moduleSize ~/ 1,
-            ),
-            Point(
-              imageCroppedRect.right / moduleSize ~/ 1,
-              imageCroppedRect.bottom / moduleSize ~/ 1,
-            ),
-          ),
-        );
-        decoration.shape.paint(context.copyWith(matrix: clippedMatrix));
+        try {
+          _clippedMatrix ??= _prepareMatrix(
+            context,
+            clippedPath: image.clipper
+                .getClip(imageScaledRect.size)
+                .shift(imageScaledRect.topLeft),
+          );
+          decoration.shape.paint(context.copyWith(matrix: _clippedMatrix));
+        } on Object catch (error, stackTrace) {
+          decoration.shape.paint(context);
+          assert(() {
+            FlutterError.reportError(
+              FlutterErrorDetails(
+                silent: true,
+                stack: stackTrace,
+                exception: error,
+                library: 'pretty qr code',
+                context: ErrorDescription('while embedding image into qr code'),
+              ),
+            );
+            return true;
+          }());
+        }
     }
+  }
+
+  @protected
+  PrettyQrMatrix _prepareMatrix(
+    final PrettyQrPaintingContext context, {
+    required Path clippedPath,
+  }) {
+    final clippedRect = clippedPath.getBounds();
+    final clippedBounds = Rectangle.fromPoints(
+      Point(
+        clippedRect.left / context.moduleDimension ~/ 1,
+        clippedRect.top / context.moduleDimension ~/ 1,
+      ),
+      Point(
+        clippedRect.right / context.moduleDimension ~/ 1,
+        clippedRect.bottom / context.moduleDimension ~/ 1,
+      ),
+    );
+
+    final excludedPoints = <Point>{};
+    if (PrettyQrRenderCapabilities.enableClipperForNestedImage) {
+      final clippedMatrixPath = Path.combine(
+        PathOperation.difference,
+        Path()..addRect(context.estimatedBounds),
+        clippedPath,
+      );
+
+      for (final module in context.matrix) {
+        if (!clippedBounds.containsPoint(module)) {
+          continue;
+        }
+
+        final intersectModulePath = Path.combine(
+          PathOperation.reverseDifference,
+          clippedMatrixPath,
+          module.resolvePath(context),
+        );
+
+        if (intersectModulePath.getBounds().isEmpty) continue;
+        // ignore: avoid-ignoring-return-values, doesn't matter.
+        excludedPoints.add(module.position);
+      }
+    } else {
+      for (final module in context.matrix) {
+        if (!clippedBounds.containsPoint(module)) continue;
+        // ignore: avoid-ignoring-return-values, doesn't matter.
+        excludedPoints.add(module.position);
+      }
+    }
+
+    return PrettyQrMatrix.masked(
+      context.matrix,
+      excludePoints: excludedPoints,
+    );
   }
 
   /// Discard any resources being held by the object.
   @mustCallSuper
   void dispose() {
+    _clippedMatrix = null;
     _decorationImagePainter?.dispose();
     _decorationImagePainter = null;
   }

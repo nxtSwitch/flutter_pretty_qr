@@ -159,4 +159,28 @@ enum PrettyQrVersion {
       'No QR Code version corresponding to the passed value',
     );
   }
+
+  /// Whether this version smaller than [other].
+  @nonVirtual
+  bool operator <(PrettyQrVersion other) {
+    return value < other.value;
+  }
+
+  /// Whether this version smaller than or equal to [other].
+  @nonVirtual
+  bool operator <=(PrettyQrVersion other) {
+    return value <= other.value;
+  }
+
+  /// Whether this version greater than [other].
+  @nonVirtual
+  bool operator >(PrettyQrVersion other) {
+    return value > other.value;
+  }
+
+  /// Whether this version greater than or equal to [other].
+  @nonVirtual
+  bool operator >=(PrettyQrVersion other) {
+    return value >= other.value;
+  }
 }

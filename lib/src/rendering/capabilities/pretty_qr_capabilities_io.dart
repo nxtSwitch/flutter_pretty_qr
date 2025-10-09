@@ -29,5 +29,7 @@ bool get isCanvasKit {
 final isImpellerWithoutNoIndexBufferFallback = () {
   if (!Platform.isIOS) return false;
   final runtimeVersion = Platform.version;
-  return runtimeVersion.startsWith('3.0') || runtimeVersion.startsWith('3.1');
+  return !runtimeVersion.startsWith('3.2') &&
+      !runtimeVersion.startsWith('3.3') &&
+      !runtimeVersion.startsWith('3.4');
 }();

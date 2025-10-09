@@ -73,7 +73,7 @@ abstract class PrettyQrShape {
       return a;
     }
 
-    if (a == null) return b!.lerpFrom(null, t) ?? b;
+    if (a == null) return b?.lerpFrom(null, t) ?? b;
     if (b == null) return a.lerpTo(null, t) ?? a;
 
     if (t == 0.0) return a;
@@ -121,7 +121,7 @@ class PrettyQrCustomShape extends PrettyQrShape {
 
     final matrix = PrettyQrMatrix.masked(
       context.matrix,
-      exclude: {
+      excludeComponents: {
         if (hasFinderPattern) PrettyQrComponentType.finderPattern,
         if (hasTimingPatterns) PrettyQrComponentType.timingPattern,
         if (hasAlignmentPatterns) PrettyQrComponentType.alignmentPattern,
@@ -134,7 +134,7 @@ class PrettyQrCustomShape extends PrettyQrShape {
         context.copyWith(
           matrix: PrettyQrMatrix.masked(
             context.matrix,
-            exclude: {
+            excludeComponents: {
               for (final type in PrettyQrComponentType.values)
                 if (type != PrettyQrComponentType.finderPattern) type,
             },
@@ -148,7 +148,7 @@ class PrettyQrCustomShape extends PrettyQrShape {
         context.copyWith(
           matrix: PrettyQrMatrix.masked(
             context.matrix,
-            exclude: {
+            excludeComponents: {
               for (final type in PrettyQrComponentType.values)
                 if (type != PrettyQrComponentType.timingPattern) type,
             },
@@ -162,7 +162,7 @@ class PrettyQrCustomShape extends PrettyQrShape {
         context.copyWith(
           matrix: PrettyQrMatrix.masked(
             context.matrix,
-            exclude: {
+            excludeComponents: {
               for (final type in PrettyQrComponentType.values)
                 if (type != PrettyQrComponentType.alignmentPattern) type,
             },

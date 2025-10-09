@@ -1,0 +1,16 @@
+import 'dart:ui';
+
+/// {@template pretty_qr_code.painting.PrettyQrClipper}
+/// An interface for providing custom QR object clips.
+///
+/// The [getClip] method is called whenever the clip needs to be updated.
+/// {@endtemplate}
+abstract class PrettyQrClipper {
+  /// Abstract const constructor. This constructor enables subclasses to provide
+  /// const constructors so that they can be used in const expressions.
+  const PrettyQrClipper();
+
+  /// Returns a path of the clip given that the object being clipped is of the
+  /// given size.
+  Path getClip(Size size);
+}
