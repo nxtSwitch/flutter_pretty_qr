@@ -17,12 +17,12 @@ import 'package:meta/meta.dart';
 @immutable
 abstract class PrettyQrQuietZone {
   /// The QR code `Quiet Zone` width.
-  num get value;
+  final double value;
 
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
   @literal
-  const PrettyQrQuietZone();
+  const PrettyQrQuietZone(this.value);
 
   /// Creates `Quiet Zone` that calculates its width using logical pixels.
   ///
@@ -42,7 +42,7 @@ abstract class PrettyQrQuietZone {
   /// {@macro pretty_qr_code.painting.PrettyQrQuietZone.standard}
   @literal
   const factory PrettyQrQuietZone.modules(
-    int value,
+    double value,
   ) = PrettyQrModulesQuietZone;
 
   /// A [PrettyQrQuietZone] with zero width.
@@ -51,7 +51,16 @@ abstract class PrettyQrQuietZone {
   /// A [PrettyQrQuietZone] with width corresponds to 4 module sizes.
   ///
   /// {@macro pretty_qr_code.painting.PrettyQrQuietZone.standard}
-  static const standart = PrettyQrQuietZone.modules(4);
+  static const standard = PrettyQrQuietZone.modules(4);
+
+  /// A [PrettyQrQuietZone] with width corresponds to 4 module sizes.
+  ///
+  /// {@macro pretty_qr_code.painting.PrettyQrQuietZone.standard}
+  @Deprecated(
+    'Please use `standard` instead. '
+    'This feature was deprecated after v4.0.0.',
+  )
+  static const standart = standard;
 
   /// Linearly interpolates between two [PrettyQrQuietZone]s.
   ///
@@ -65,23 +74,26 @@ abstract class PrettyQrQuietZone {
       return a;
     }
 
+    if (a == null) return b?.lerpFrom(null, t) ?? b;
+    if (b == null) return a.lerpTo(null, t) ?? a;
+
     if (t == 0.0) return a;
     if (t == 1.0) return b;
 
-    if ((a == null || a.value == 0) && b is PrettyQrPixelsQuietZone) {
-      return PrettyQrPixelsQuietZone(b.value * t);
-    }
-
-    if ((b == null || b.value == 0) && a is PrettyQrPixelsQuietZone) {
-      return PrettyQrPixelsQuietZone(a.value * (1.0 - t));
-    }
-
-    if (a is PrettyQrPixelsQuietZone && b is PrettyQrPixelsQuietZone) {
-      return PrettyQrPixelsQuietZone(lerpDouble(a.value, b.value, t)!);
-    }
-
-    return t < 0.5 ? a : b;
+    return b.lerpFrom(a, t) ?? a.lerpTo(b, t) ?? b;
   }
+
+  /// Linearly interpolates from another [PrettyQrShape] (which may be of a
+  /// different class) to `this`.
+  ///
+  /// Instead of calling this directly, use [PrettyQrShape.lerp].
+  PrettyQrQuietZone? lerpFrom(PrettyQrQuietZone? a, double t);
+
+  /// Linearly interpolates from `this` to another [PrettyQrQuietZone] (which may be
+  /// of a different class).
+  ///
+  /// Instead of calling this directly, use [PrettyQrQuietZone.lerp].
+  PrettyQrQuietZone? lerpTo(PrettyQrQuietZone? b, double t);
 }
 
 /// {@template pretty_qr_code.painting.PrettyQrPixelsQuietZone}
@@ -90,12 +102,39 @@ abstract class PrettyQrQuietZone {
 @sealed
 @immutable
 class PrettyQrPixelsQuietZone extends PrettyQrQuietZone {
-  @override
-  final double value;
-
   /// {@macro pretty_qr_code.painting.PrettyQrPixelsQuietZone}
   @literal
-  const PrettyQrPixelsQuietZone(this.value);
+  const PrettyQrPixelsQuietZone(super.value);
+
+  @override
+  PrettyQrPixelsQuietZone? lerpFrom(PrettyQrQuietZone? a, double t) {
+    if (identical(a, this)) {
+      return this;
+    }
+
+    if (a == null) return this;
+    if (a is! PrettyQrPixelsQuietZone) return null;
+
+    if (t == 0.0) return a;
+    if (t == 1.0) return this;
+
+    return PrettyQrPixelsQuietZone(lerpDouble(a.value, value, t)!);
+  }
+
+  @override
+  PrettyQrPixelsQuietZone? lerpTo(PrettyQrQuietZone? b, double t) {
+    if (identical(this, b)) {
+      return this;
+    }
+
+    if (b == null) return this;
+    if (b is! PrettyQrPixelsQuietZone) return null;
+
+    if (t == 0.0) return this;
+    if (t == 1.0) return b;
+
+    return PrettyQrPixelsQuietZone(lerpDouble(value, b.value, t)!);
+  }
 
   @override
   int get hashCode {
@@ -115,12 +154,39 @@ class PrettyQrPixelsQuietZone extends PrettyQrQuietZone {
 @sealed
 @immutable
 class PrettyQrModulesQuietZone extends PrettyQrQuietZone {
-  @override
-  final int value;
-
   /// {@macro pretty_qr_code.painting.PrettyQrModulesQuietZone}
   @literal
-  const PrettyQrModulesQuietZone(this.value);
+  const PrettyQrModulesQuietZone(super.value);
+
+  @override
+  PrettyQrModulesQuietZone? lerpFrom(PrettyQrQuietZone? a, double t) {
+    if (identical(a, this)) {
+      return this;
+    }
+
+    if (a == null) return this;
+    if (a is! PrettyQrModulesQuietZone) return null;
+
+    if (t == 0.0) return a;
+    if (t == 1.0) return this;
+
+    return PrettyQrModulesQuietZone(lerpDouble(a.value, value, t)!);
+  }
+
+  @override
+  PrettyQrModulesQuietZone? lerpTo(PrettyQrQuietZone? b, double t) {
+    if (identical(this, b)) {
+      return this;
+    }
+
+    if (b == null) return this;
+    if (b is! PrettyQrModulesQuietZone) return null;
+
+    if (t == 0.0) return this;
+    if (t == 1.0) return b;
+
+    return PrettyQrModulesQuietZone(lerpDouble(value, b.value, t)!);
+  }
 
   @override
   int get hashCode {

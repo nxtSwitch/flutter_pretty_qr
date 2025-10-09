@@ -19,12 +19,12 @@ void main() {
     );
   });
 
-  group('PrettyQrQuietZone.standart', () {
+  group('PrettyQrQuietZone.standard', () {
     test(
-      'returns correct quiet zone with standart width',
+      'returns correct quiet zone with standard width',
       () {
         // act
-        const quietZone = PrettyQrQuietZone.standart;
+        const quietZone = PrettyQrQuietZone.standard;
 
         // assert
         expect(quietZone.value, equals(4));
@@ -55,7 +55,7 @@ void main() {
       'returns correct quiet zone object',
       () {
         // arrange
-        final value = Random().nextInt(256);
+        final value = Random().nextDouble();
 
         // act
         final quietZone = PrettyQrQuietZone.modules(value);
@@ -382,7 +382,7 @@ void main() {
       'should be equal when instance is the same',
       () {
         // arrange
-        final value = Random().nextInt(256);
+        final value = Random().nextDouble();
         final instance = PrettyQrModulesQuietZone(value);
 
         // assert
@@ -394,7 +394,7 @@ void main() {
       'should be equal when instances are different',
       () {
         // arrange
-        final value = Random().nextInt(256);
+        final value = Random().nextDouble();
         final instance1 = PrettyQrModulesQuietZone(value);
         final instance2 = PrettyQrModulesQuietZone(value);
 
@@ -407,7 +407,7 @@ void main() {
       'should not be equal when values are different',
       () {
         // arrange
-        final value = Random().nextInt(256);
+        final value = Random().nextDouble();
         final instance1 = PrettyQrModulesQuietZone(value);
         final instance2 = PrettyQrModulesQuietZone(value + 1);
 
@@ -420,7 +420,7 @@ void main() {
       'should have same hashCode when values are equal',
       () {
         // arrange
-        final value = Random().nextInt(256);
+        final value = Random().nextDouble();
         final instance1 = PrettyQrModulesQuietZone(value);
         final instance2 = PrettyQrModulesQuietZone(value);
 
