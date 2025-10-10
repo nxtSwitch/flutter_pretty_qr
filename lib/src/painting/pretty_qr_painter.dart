@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:meta/meta.dart';
-import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:pretty_qr_code/src/base/pretty_qr_matrix.dart';
@@ -92,11 +92,22 @@ class PrettyQrPainter {
     );
     final imageCroppedRect = imagePadding.deflateRect(imageScaledRect);
 
+    final imageClipPath = image.clipper.getClip(imageScaledRect.size);
+    final imageClipTransform = Matrix4.identity()
+      ..translate(
+        imageCroppedRect.topLeft.dx,
+        imageCroppedRect.topLeft.dy,
+      )
+      ..scale(
+        imageCroppedRect.width / imageScaledRect.width,
+        imageCroppedRect.height / imageScaledRect.height,
+      );
+
     _decorationImagePainter ??= image.createPainter(onChanged);
     _decorationImagePainter?.paint(
       context.canvas,
       imageCroppedRect,
-      null,
+      imageClipPath.transform(imageClipTransform.storage),
       configuration.copyWith(size: imageCroppedRect.size),
     );
 
@@ -110,9 +121,7 @@ class PrettyQrPainter {
         try {
           _clippedMatrix ??= _prepareMatrix(
             context,
-            clippedPath: image.clipper
-                .getClip(imageScaledRect.size)
-                .shift(imageScaledRect.topLeft),
+            clippedPath: imageClipPath.shift(imageScaledRect.topLeft),
           );
           decoration.shape.paint(context.copyWith(matrix: _clippedMatrix));
         } on Object catch (error, stackTrace) {
