@@ -107,13 +107,13 @@ class PrettyQrPixelsQuietZone extends PrettyQrQuietZone {
   const PrettyQrPixelsQuietZone(super.value);
 
   @override
-  PrettyQrPixelsQuietZone? lerpFrom(PrettyQrQuietZone? a, double t) {
+  PrettyQrQuietZone lerpFrom(PrettyQrQuietZone? a, double t) {
     if (identical(a, this)) {
       return this;
     }
 
     if (a == null) return this;
-    if (a is! PrettyQrPixelsQuietZone) return null;
+    if (a is! PrettyQrPixelsQuietZone) return t < 0.5 ? a : this;
 
     if (t == 0.0) return a;
     if (t == 1.0) return this;
@@ -122,13 +122,13 @@ class PrettyQrPixelsQuietZone extends PrettyQrQuietZone {
   }
 
   @override
-  PrettyQrPixelsQuietZone? lerpTo(PrettyQrQuietZone? b, double t) {
+  PrettyQrQuietZone lerpTo(PrettyQrQuietZone? b, double t) {
     if (identical(this, b)) {
       return this;
     }
 
     if (b == null) return this;
-    if (b is! PrettyQrPixelsQuietZone) return null;
+    if (b is! PrettyQrPixelsQuietZone) return t < 0.5 ? this : b;
 
     if (t == 0.0) return this;
     if (t == 1.0) return b;
@@ -159,13 +159,13 @@ class PrettyQrModulesQuietZone extends PrettyQrQuietZone {
   const PrettyQrModulesQuietZone(super.value);
 
   @override
-  PrettyQrModulesQuietZone? lerpFrom(PrettyQrQuietZone? a, double t) {
+  PrettyQrQuietZone lerpFrom(PrettyQrQuietZone? a, double t) {
     if (identical(a, this)) {
       return this;
     }
 
     if (a == null) return this;
-    if (a is! PrettyQrModulesQuietZone) return null;
+    if (a is! PrettyQrModulesQuietZone) return t < 0.5 ? a : this;
 
     if (t == 0.0) return a;
     if (t == 1.0) return this;
@@ -174,13 +174,13 @@ class PrettyQrModulesQuietZone extends PrettyQrQuietZone {
   }
 
   @override
-  PrettyQrModulesQuietZone? lerpTo(PrettyQrQuietZone? b, double t) {
+  PrettyQrQuietZone lerpTo(PrettyQrQuietZone? b, double t) {
     if (identical(this, b)) {
       return this;
     }
 
     if (b == null) return this;
-    if (b is! PrettyQrModulesQuietZone) return null;
+    if (b is! PrettyQrModulesQuietZone) return t < 0.5 ? this : b;
 
     if (t == 0.0) return this;
     if (t == 1.0) return b;
