@@ -229,7 +229,11 @@ class _PrettyQrMaskedMatrix extends PrettyQrMatrix {
 
   @override
   int get hashCode {
-    return Object.hash(parent, excludePoints, excludeComponents);
+    return Object.hashAll([
+      parent,
+      ...excludePoints,
+      ...excludeComponents,
+    ]);
   }
 
   @override
