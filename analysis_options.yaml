@@ -13,6 +13,7 @@ dart_code_metrics:
     avoid-similar-names:
       exclude:
         - test/**
+        - lib/src/painting/shapes/**
     enum-constants-ordering: false
     format-comment:
       only-doc-comments: true

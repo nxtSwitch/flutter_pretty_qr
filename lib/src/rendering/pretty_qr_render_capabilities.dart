@@ -32,6 +32,6 @@ abstract class PrettyQrRenderCapabilities {
       !kIsWeb || capabilities.isCanvasKit || capabilities.isSkwasm;
 
   /// Whether to clip nested images with custom clipper.
-  static bool enableClipperForNestedImage =
+  static bool enableClippersForNestedImage =
       !kIsWeb || capabilities.isCanvasKit || capabilities.isSkwasm;
 }

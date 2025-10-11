@@ -10,13 +10,11 @@ extension PrettyQrRectanglePaintExtension on Rectangle<int> {
   /// are relative to a given QR Symbol.
   @pragma('vm:prefer-inline')
   Rect resolveRect(PrettyQrPaintingContext context) {
-    final canvasDimension = context.estimatedBounds.longestSide;
-    final moduleDimension = canvasDimension / context.matrix.version.dimension;
     return Rect.fromLTRB(
-      left * moduleDimension,
-      top * moduleDimension,
-      (left + width + 1) * moduleDimension,
-      (top + height + 1) * moduleDimension,
-    );
+      left * context.moduleDimension,
+      top * context.moduleDimension,
+      (left + width + 1) * context.moduleDimension,
+      (top + height + 1) * context.moduleDimension,
+    ).shift(context.estimatedBounds.topLeft);
   }
 }

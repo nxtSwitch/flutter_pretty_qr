@@ -10,7 +10,7 @@ import 'package:pretty_qr_code/src/painting/extensions/pretty_qr_rectangle_exten
 
 /// A dots QR Code style.
 @sealed
-class PrettyQrDotsSymbol implements PrettyQrShape {
+class PrettyQrDotsSymbol extends PrettyQrShape {
   /// The color or brush to use when filling the QR Code.
   @nonVirtual
   final Color color;

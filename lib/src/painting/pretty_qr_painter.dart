@@ -69,8 +69,6 @@ class PrettyQrPainter {
     }
 
     final image = decoration.image;
-    final size = context.estimatedBounds.size;
-
     if (image == null) {
       decoration.shape.paint(context);
       return;
@@ -81,34 +79,35 @@ class PrettyQrPainter {
     }
 
     final imageScale = image.scale.clamp(0.0, 1.0);
-    final imageScaledRect = Rect.fromCenter(
-      center: size.center(Offset.zero),
-      width: size.width * imageScale,
-      height: size.height * imageScale,
-    );
-
+    final shapeBounds = decoration.shape.getBounds(context);
     final imagePadding = (image.padding * imageScale).resolve(
       configuration.textDirection,
     );
-    final imageCroppedRect = imagePadding.deflateRect(imageScaledRect);
+
+    final imageScaledRect = Rect.fromCenter(
+      center: shapeBounds.center,
+      width: shapeBounds.size.width * imageScale,
+      height: shapeBounds.size.height * imageScale,
+    );
+    final imageDeflatedRect = imagePadding.deflateRect(imageScaledRect);
 
     final imageClipPath = image.clipper.getClip(imageScaledRect.size);
     final imageClipTransform = Matrix4.identity()
       ..translate(
-        imageCroppedRect.topLeft.dx,
-        imageCroppedRect.topLeft.dy,
+        imageDeflatedRect.topLeft.dx,
+        imageDeflatedRect.topLeft.dy,
       )
       ..scale(
-        imageCroppedRect.width / imageScaledRect.width,
-        imageCroppedRect.height / imageScaledRect.height,
+        imageDeflatedRect.width / imageScaledRect.width,
+        imageDeflatedRect.height / imageScaledRect.height,
       );
 
     _decorationImagePainter ??= image.createPainter(onChanged);
     _decorationImagePainter?.paint(
       context.canvas,
-      imageCroppedRect,
+      imageDeflatedRect,
       imageClipPath.transform(imageClipTransform.storage),
-      configuration.copyWith(size: imageCroppedRect.size),
+      configuration.copyWith(size: imageDeflatedRect.size),
     );
 
     switch (image.position) {
@@ -147,47 +146,35 @@ class PrettyQrPainter {
     final PrettyQrPaintingContext context, {
     required Path clippedPath,
   }) {
-    final clippedRect = clippedPath.getBounds();
-    final clippedBounds = Rectangle.fromPoints(
-      Point(
-        clippedRect.left / context.moduleDimension ~/ 1,
-        clippedRect.top / context.moduleDimension ~/ 1,
-      ),
-      Point(
-        clippedRect.right / context.moduleDimension ~/ 1,
-        clippedRect.bottom / context.moduleDimension ~/ 1,
-      ),
+    final clipBounds = clippedPath.getBounds();
+    final shapeBounds = decoration.shape.getBounds(context);
+
+    final matrixDimension = context.matrix.dimension;
+    final moduleDimension = shapeBounds.longestSide / matrixDimension;
+    final clipMatrixBounds = Rectangle(
+      (matrixDimension - clipBounds.width / moduleDimension) ~/ 2,
+      (matrixDimension - clipBounds.height / moduleDimension) ~/ 2,
+      (clipBounds.width / moduleDimension).ceil(),
+      (clipBounds.height / moduleDimension).ceil(),
     );
 
     final excludedPoints = <Point>{};
-    if (PrettyQrRenderCapabilities.enableClipperForNestedImage) {
-      final clippedMatrixPath = Path.combine(
-        PathOperation.difference,
-        Path()..addRect(context.estimatedBounds),
-        clippedPath,
-      );
+    for (final module in context.matrix) {
+      if (!clipMatrixBounds.containsPoint(module)) {
+        continue;
+      }
 
-      for (final module in context.matrix) {
-        if (!clippedBounds.containsPoint(module)) {
-          continue;
-        }
-
-        final intersectModulePath = Path.combine(
-          PathOperation.reverseDifference,
-          clippedMatrixPath,
-          module.resolvePath(context),
+      if (PrettyQrRenderCapabilities.enableClippersForNestedImage) {
+        final intersectedModulePath = Path.combine(
+          PathOperation.intersect,
+          clippedPath,
+          Path()..addRect(module.toRect(moduleDimension, shapeBounds.topLeft)),
         );
+        if (intersectedModulePath.getBounds().isEmpty) continue;
+      }
 
-        if (intersectModulePath.getBounds().isEmpty) continue;
-        // ignore: avoid-ignoring-return-values, doesn't matter.
-        excludedPoints.add(module.position);
-      }
-    } else {
-      for (final module in context.matrix) {
-        if (!clippedBounds.containsPoint(module)) continue;
-        // ignore: avoid-ignoring-return-values, doesn't matter.
-        excludedPoints.add(module.position);
-      }
+      // ignore: avoid-ignoring-return-values, doesn't matter.
+      excludedPoints.add(module.position);
     }
 
     return PrettyQrMatrix.masked(

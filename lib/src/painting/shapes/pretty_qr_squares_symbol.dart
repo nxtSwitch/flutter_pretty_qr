@@ -1,5 +1,3 @@
-// ignore_for_file: avoid-similar-names
-
 import 'dart:ui';
 
 import 'package:meta/meta.dart';
@@ -17,7 +15,7 @@ import 'package:pretty_qr_code/src/painting/extensions/pretty_qr_rectangle_exten
 
 /// A square modules that can be rounded.
 @sealed
-class PrettyQrSquaresSymbol implements PrettyQrShape {
+class PrettyQrSquaresSymbol extends PrettyQrShape {
   /// The color or brush to use when filling the QR Code.
   @nonVirtual
   final Color color;

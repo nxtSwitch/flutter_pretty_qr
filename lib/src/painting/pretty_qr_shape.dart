@@ -1,5 +1,7 @@
 // ignore_for_file: prefer-static-class, delete clampDouble after min flutter version upgrade.
 
+import 'dart:ui';
+
 import 'package:meta/meta.dart';
 
 import 'package:pretty_qr_code/src/base/pretty_qr_matrix.dart';
@@ -48,14 +50,14 @@ abstract class PrettyQrShape {
   /// Paints the QR matrix on the canvas of the given painting context.
   void paint(PrettyQrPaintingContext context);
 
-  /// Same as [num.clamp] but optimized for a non-null [double].
-  @protected
-  static double clampDouble(double x, double min, double max) {
-    assert(min <= max && !max.isNaN && !min.isNaN);
-    if (x < min) return min;
-    if (x > max) return max;
-    if (x.isNaN) return max;
-    return x;
+  /// Returns a bounds of the QR code symbol painted by [paint], as an
+  /// axis-aligned Rect.
+  ///
+  /// By default, this returns a rectangle that is the same size as
+  /// the context estimated bounds. If shape paints a QR code symbol that is
+  /// roughly the same size as the context bounds, then this may be adequate.
+  Rect getBounds(PrettyQrPaintingContext context) {
+    return context.estimatedBounds;
   }
 
   /// Linearly interpolates between two [PrettyQrShape]s.

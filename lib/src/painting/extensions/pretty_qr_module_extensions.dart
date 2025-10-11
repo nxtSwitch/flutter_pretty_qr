@@ -5,17 +5,26 @@ import 'package:pretty_qr_code/src/rendering/pretty_qr_painting_context.dart';
 
 /// Extension that apply to QR module.
 extension PrettyQrModuleExtension on PrettyQrModule {
-  /// Convert this instance into a path whose are relative to a given QR code.
+  /// Returns this QR code module as floating-point rectangle with given offset.
   @pragma('vm:prefer-inline')
-  Path resolvePath(PrettyQrPaintingContext context) {
-    return Path()..addRect(resolveRect(context));
+  Rect toRect(
+    final double dimension, [
+    final Offset offset = Offset.zero,
+  ]) {
+    return Rect.fromLTWH(
+      offset.dx + dimension * x,
+      offset.dy + dimension * y,
+      dimension,
+      dimension,
+    );
   }
 
   /// Convert this instance into a floating-point rectangle whose coordinates
   /// are relative to a given QR code.
   @pragma('vm:prefer-inline')
-  Rect resolveRect(PrettyQrPaintingContext context) {
-    final pointSize = context.moduleDimension;
-    return Rect.fromLTWH(pointSize * x, pointSize * y, pointSize, pointSize);
+  Rect resolveRect(
+    final PrettyQrPaintingContext context,
+  ) {
+    return toRect(context.moduleDimension, context.estimatedBounds.topLeft);
   }
 }

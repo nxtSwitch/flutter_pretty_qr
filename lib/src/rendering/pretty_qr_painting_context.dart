@@ -25,8 +25,7 @@ class PrettyQrPaintingContext {
   final TextDirection? textDirection;
 
   /// Creates a QR painting context.
-  @literal
-  const PrettyQrPaintingContext(
+  PrettyQrPaintingContext(
     this.canvas,
     this.estimatedBounds, {
     required this.matrix,
@@ -35,32 +34,33 @@ class PrettyQrPaintingContext {
 
   /// Returns QR code bounds dimension.
   @pragma('vm:prefer-inline')
-  double get boundsDimension {
+  late double boundsDimension = () {
     assert(
-      estimatedBounds.width == estimatedBounds.height,
+      estimatedBounds.width.truncate() == estimatedBounds.height.truncate(),
       'The estimated bounds should be a square.',
     );
     return estimatedBounds.width;
-  }
+  }();
 
   /// Returns QR code single module dimension.
   @pragma('vm:prefer-inline')
-  double get moduleDimension {
+  late double moduleDimension = () {
     return boundsDimension / matrix.dimension;
-  }
+  }();
 
   /// Creates a copy of this [PrettyQrPaintingContext] but with the given fields
   /// replaced with the new values.
   @factory
   @useResult
   PrettyQrPaintingContext copyWith({
+    final Rect? estimatedBounds,
     final PrettyQrMatrix? matrix,
     final TextDirection? textDirection,
   }) {
     return PrettyQrPaintingContext(
       canvas,
-      estimatedBounds,
       matrix: matrix ?? this.matrix,
+      estimatedBounds ?? this.estimatedBounds,
       textDirection: textDirection ?? this.textDirection,
     );
   }
