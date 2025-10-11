@@ -107,31 +107,37 @@ class PrettyQrPixelsQuietZone extends PrettyQrQuietZone {
   const PrettyQrPixelsQuietZone(super.value);
 
   @override
-  PrettyQrQuietZone lerpFrom(PrettyQrQuietZone? a, double t) {
+  PrettyQrQuietZone? lerpFrom(PrettyQrQuietZone? a, double t) {
     if (identical(a, this)) {
       return this;
     }
 
     if (a == null) return this;
-    if (a is! PrettyQrPixelsQuietZone) return t < 0.5 ? a : this;
-
     if (t == 0.0) return a;
     if (t == 1.0) return this;
+
+    if (a.value != 0 && a is! PrettyQrPixelsQuietZone) {
+      if (value == 0) return a.lerpTo(this, t);
+      return t < 0.5 ? a : this;
+    }
 
     return PrettyQrPixelsQuietZone(lerpDouble(a.value, value, t)!);
   }
 
   @override
-  PrettyQrQuietZone lerpTo(PrettyQrQuietZone? b, double t) {
+  PrettyQrQuietZone? lerpTo(PrettyQrQuietZone? b, double t) {
     if (identical(this, b)) {
       return this;
     }
 
     if (b == null) return this;
-    if (b is! PrettyQrPixelsQuietZone) return t < 0.5 ? this : b;
-
     if (t == 0.0) return this;
     if (t == 1.0) return b;
+
+    if (b.value != 0 && b is! PrettyQrPixelsQuietZone) {
+      if (value == 0) return b.lerpFrom(this, t);
+      return t < 0.5 ? this : b;
+    }
 
     return PrettyQrPixelsQuietZone(lerpDouble(value, b.value, t)!);
   }
@@ -159,31 +165,37 @@ class PrettyQrModulesQuietZone extends PrettyQrQuietZone {
   const PrettyQrModulesQuietZone(super.value);
 
   @override
-  PrettyQrQuietZone lerpFrom(PrettyQrQuietZone? a, double t) {
+  PrettyQrQuietZone? lerpFrom(PrettyQrQuietZone? a, double t) {
     if (identical(a, this)) {
       return this;
     }
 
     if (a == null) return this;
-    if (a is! PrettyQrModulesQuietZone) return t < 0.5 ? a : this;
-
     if (t == 0.0) return a;
     if (t == 1.0) return this;
+
+    if (a.value != 0 && a is! PrettyQrModulesQuietZone) {
+      if (value == 0) return a.lerpTo(this, t);
+      return t < 0.5 ? a : this;
+    }
 
     return PrettyQrModulesQuietZone(lerpDouble(a.value, value, t)!);
   }
 
   @override
-  PrettyQrQuietZone lerpTo(PrettyQrQuietZone? b, double t) {
+  PrettyQrQuietZone? lerpTo(PrettyQrQuietZone? b, double t) {
     if (identical(this, b)) {
       return this;
     }
 
     if (b == null) return this;
-    if (b is! PrettyQrModulesQuietZone) return t < 0.5 ? this : b;
-
     if (t == 0.0) return this;
     if (t == 1.0) return b;
+
+    if (b.value != 0 && b is! PrettyQrModulesQuietZone) {
+      if (value == 0) return b.lerpFrom(this, t);
+      return t < 0.5 ? this : b;
+    }
 
     return PrettyQrModulesQuietZone(lerpDouble(value, b.value, t)!);
   }

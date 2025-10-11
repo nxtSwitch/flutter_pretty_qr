@@ -106,7 +106,7 @@ void main() {
     );
 
     test(
-      'lerp returns destination value when destination equals to 1.0',
+      'lerp returns destination value when destination modules equals to 1.0',
       () {
         // arrange
         const source = PrettyQrQuietZone.modules(1);
@@ -148,17 +148,16 @@ void main() {
     );
 
     test(
-      'lerp returns correct value when source is zero and destination is '
-      'pixels based quiet zone',
+      'lerp returns correct value when source is null and destination is '
+      'modules based quiet zone',
       () {
         // arrange
         const offset = 0.6;
-        const source = PrettyQrModulesQuietZone(0);
-        const destination = PrettyQrPixelsQuietZone(256);
+        const destination = PrettyQrModulesQuietZone(8);
 
         // act
         final lerpedQuietZone = PrettyQrQuietZone.lerp(
-          source,
+          null,
           destination,
           offset,
         );
@@ -166,7 +165,7 @@ void main() {
         // assert
         expect(
           lerpedQuietZone,
-          equals(PrettyQrPixelsQuietZone(destination.value * offset)),
+          equals(destination),
         );
       },
     );
@@ -190,6 +189,77 @@ void main() {
         expect(
           lerpedQuietZone,
           equals(source),
+        );
+      },
+    );
+
+    test(
+      'lerp returns correct value when destination is null and source is '
+      'modules based quiet zone',
+      () {
+        // arrange
+        const offset = 0.6;
+        const source = PrettyQrModulesQuietZone(8);
+
+        // act
+        final lerpedQuietZone = PrettyQrQuietZone.lerp(
+          source,
+          null,
+          offset,
+        );
+
+        // assert
+        expect(
+          lerpedQuietZone,
+          equals(source),
+        );
+      },
+    );
+
+    test(
+      'lerp returns correct value when source is modules based zero quiet zone '
+      'and destination is pixels based quiet zone',
+      () {
+        // arrange
+        const offset = 0.6;
+        const source = PrettyQrModulesQuietZone(0);
+        const destination = PrettyQrPixelsQuietZone(256);
+
+        // act
+        final lerpedQuietZone = PrettyQrQuietZone.lerp(
+          source,
+          destination,
+          offset,
+        );
+
+        // assert
+        expect(
+          lerpedQuietZone,
+          equals(PrettyQrPixelsQuietZone(destination.value * offset)),
+        );
+      },
+    );
+
+    test(
+      'lerp returns correct value when source is pixels based zero quiet zone '
+      'and destination is modules based quiet zone',
+      () {
+        // arrange
+        const offset = 0.6;
+        const source = PrettyQrPixelsQuietZone(0);
+        const destination = PrettyQrModulesQuietZone(256);
+
+        // act
+        final lerpedQuietZone = PrettyQrQuietZone.lerp(
+          source,
+          destination,
+          offset,
+        );
+
+        // assert
+        expect(
+          lerpedQuietZone,
+          equals(PrettyQrModulesQuietZone(destination.value * offset)),
         );
       },
     );
@@ -219,6 +289,30 @@ void main() {
     );
 
     test(
+      'lerp returns correct value when destination is zero and source is '
+      'pixels based quiet zone',
+      () {
+        // arrange
+        const offset = 0.6;
+        const source = PrettyQrModulesQuietZone(256);
+        const destination = PrettyQrPixelsQuietZone(0);
+
+        // act
+        final lerpedQuietZone = PrettyQrQuietZone.lerp(
+          source,
+          destination,
+          offset,
+        );
+
+        // assert
+        expect(
+          lerpedQuietZone,
+          equals(PrettyQrModulesQuietZone(source.value * (1.0 - offset))),
+        );
+      },
+    );
+
+    test(
       'lerp returns correct value when source and destination are pixels based '
       'quiet zones',
       () {
@@ -238,6 +332,32 @@ void main() {
         expect(
           lerpedQuietZone,
           equals(PrettyQrPixelsQuietZone(
+            source.value * (1.0 - offset) + destination.value * offset,
+          )),
+        );
+      },
+    );
+
+    test(
+      'lerp returns correct value when source and destination are modules '
+      'based quiet zones',
+      () {
+        // arrange
+        const offset = 0.6;
+        const source = PrettyQrModulesQuietZone(2);
+        const destination = PrettyQrModulesQuietZone(8);
+
+        // act
+        final lerpedQuietZone = PrettyQrQuietZone.lerp(
+          source,
+          destination,
+          offset,
+        );
+
+        // assert
+        expect(
+          lerpedQuietZone,
+          equals(PrettyQrModulesQuietZone(
             source.value * (1.0 - offset) + destination.value * offset,
           )),
         );
