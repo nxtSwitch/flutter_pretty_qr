@@ -1,3 +1,8 @@
+## Unreleased
+
+* Add configurable bounds for QR code shapes.
+* Add support custom clippers for embedded images [#38](https://github.com/promops/flutter_pretty_qr/issues/66).
+
 ## 3.5.0
 
 * Added new patterns: [dots](https://pub.dev/documentation/pretty_qr_code/latest/pretty_qr_code/PrettyQrDotsSymbol-class.html) and [squares](https://pub.dev/documentation/pretty_qr_code/latest/pretty_qr_code/PrettyQrSquaresSymbol-class.html).
