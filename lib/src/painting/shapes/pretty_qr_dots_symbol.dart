@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 
@@ -53,13 +54,17 @@ class PrettyQrDotsSymbol extends PrettyQrShape {
       canvasBounds,
       textDirection: context.textDirection,
     )..style = PaintingStyle.fill;
+    dotPaint.strokeCap = StrokeCap.round;
+    dotPaint.strokeWidth = effectiveDotRadius * 2;
 
     final circlePaint = brush.toPaint(
       canvasBounds,
       textDirection: context.textDirection,
-    );
-    circlePaint.style = PaintingStyle.stroke;
+    )..style = PaintingStyle.stroke;
     circlePaint.strokeWidth = moduleDimension / 1.5;
+
+    int modulesCount = 0;
+    final modulesPoints = Float32List(matrix.length * 2);
 
     for (final module in context.matrix) {
       if (!module.isDark) continue;
@@ -67,8 +72,15 @@ class PrettyQrDotsSymbol extends PrettyQrShape {
       if (unifiedAlignmentPatterns && module.isAlignmentPattern) continue;
 
       final rect = module.resolveRect(context);
-      context.canvas.drawCircle(rect.center, effectiveDotRadius, dotPaint);
+      modulesPoints[modulesCount++] = rect.center.dx;
+      modulesPoints[modulesCount++] = rect.center.dy;
     }
+
+    context.canvas.drawRawPoints(
+      PointMode.points,
+      Float32List.sublistView(modulesPoints, 0, modulesCount),
+      dotPaint,
+    );
 
     if (unifiedFinderPattern) {
       for (final pattern in matrix.positionDetectionPatterns) {
