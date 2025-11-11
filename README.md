@@ -124,5 +124,5 @@ Here is a curated list of how you can help:
 * ~~Error handling API~~
 * ~~Background color for QR code~~
 * ~~Timing Patterns and Alignment Patterns~~
+* ~~Support custom clippers for embedded images ([#38](https://github.com/promops/flutter_pretty_qr/issues/38))~~
 * Export as vector image ([#42](https://github.com/promops/flutter_pretty_qr/issues/42))
-* Support custom clippers for embedded images ([#38](https://github.com/promops/flutter_pretty_qr/issues/38))
