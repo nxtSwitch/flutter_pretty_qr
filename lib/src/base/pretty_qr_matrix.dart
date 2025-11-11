@@ -74,6 +74,12 @@ class PrettyQrMatrix extends Iterable<PrettyQrModule> {
     );
   }
 
+  @override
+  @pragma('vm:prefer-inline')
+  int get length {
+    return modules.length;
+  }
+
   /// Returns the size (side length) of the matrix.
   @nonVirtual
   @pragma('vm:prefer-inline')
@@ -82,6 +88,7 @@ class PrettyQrMatrix extends Iterable<PrettyQrModule> {
   }
 
   @override
+  @pragma('vm:prefer-inline')
   Iterator<PrettyQrModule> get iterator {
     return modules.iterator;
   }
@@ -108,37 +115,48 @@ class PrettyQrMatrix extends Iterable<PrettyQrModule> {
   /// Returns `true` if a module at position [x], [y] has `isDark` value equals
   /// to `true`.
   bool hasModuleAt(int x, int y) {
-    final module = getModuleAt(x, y);
+    final module = moduleAtOrNull(x, y);
     return module != null && module.isDark;
   }
 
-  /// {@template pretty_qr_code.PrettyQrMatrix.getModuleAt}
-  /// Returns the value of the module at position [x], [y] or `null` if the
-  /// coordinate is outside the matrix.
-  /// {@endtemplate}
+  @override
   @useResult
-  PrettyQrModule? getModuleAt(int x, int y) {
-    if (y < 0 || y >= version.dimension) return null;
-    if (x < 0 || x >= version.dimension) return null;
-
-    final moduleIndex = y * dimension + x;
-    return modules[moduleIndex];
+  @pragma('vm:prefer-inline')
+  PrettyQrModule elementAt(int index) {
+    return modules[index];
   }
 
-  /// {@macro pretty_qr_code.PrettyQrMatrix.getModuleAt}
+  /// {@template pretty_qr_code.PrettyQrMatrix.moduleAt}
+  /// Returns the value of the module at position [x], [y].
+  /// {@endtemplate}
+  @useResult
+  @pragma('vm:prefer-inline')
+  PrettyQrModule moduleAt(int x, int y) {
+    return elementAt(y * dimension + x);
+  }
+
+  /// Returns the value of the module at position [x], [y] or `null` if the
+  /// coordinate is outside the matrix.
+  PrettyQrModule? moduleAtOrNull(int x, int y) {
+    if (y < 0 || y >= version.dimension) return null;
+    if (x < 0 || x >= version.dimension) return null;
+    return elementAt(y * dimension + x);
+  }
+
+  /// {@macro pretty_qr_code.PrettyQrMatrix.moduleAt}
   @Deprecated(
-    'Please use `getModuleAt` instead. '
+    'Please use `moduleAt` instead. '
     'This feature was deprecated after v4.0.0.',
   )
-  PrettyQrModule? getModule(int x, int y) {
-    return getModuleAt(x, y);
+  PrettyQrModule getModule(int x, int y) {
+    return moduleAt(x, y);
   }
 
   /// Set `isDark` equals to `false` fot the module at position [x], [y].
   @nonVirtual
   @Deprecated('This feature was deprecated after v4.0.0.')
   void removeDarkAt(int x, int y) {
-    final module = getModuleAt(x, y)!;
+    final module = moduleAt(x, y);
     modules[y * version.dimension + x] = module.toBlank();
   }
 
@@ -211,14 +229,12 @@ class _PrettyQrMaskedMatrix extends PrettyQrMatrix {
 
   @override
   Iterator<PrettyQrModule> get iterator {
-    return modules.map((module) => getModuleAt(module.x, module.y)!).iterator;
+    return modules.map((module) => moduleAt(module.x, module.y)).iterator;
   }
 
   @override
-  PrettyQrModule? getModuleAt(int x, int y) {
-    final module = parent.getModuleAt(x, y);
-
-    if (module == null) return module;
+  PrettyQrModule elementAt(int index) {
+    final module = parent.elementAt(index);
     if (!module.isDark) return module;
 
     late final exludedPoints = excludePoints.contains(module.position);
