@@ -386,7 +386,8 @@ class _PrettyQrSettingsState extends State<_PrettyQrSettings> {
                 constraints: BoxConstraints(
                   minWidth: constraints.maxWidth,
                 ),
-                initialValue: brush == _PrettyQrSettings.kDefaultQrDecorationBrush,
+                initialValue:
+                    brush == _PrettyQrSettings.kDefaultQrDecorationBrush,
                 itemBuilder: (context) {
                   return [
                     const PopupMenuItem(
@@ -419,7 +420,9 @@ class _PrettyQrSettingsState extends State<_PrettyQrSettings> {
         if (isRoundedBorders != null)
           SwitchListTile.adaptive(
             value: isRoundedBorders ?? true,
-            onChanged: isRoundedBorders == null ? null : (value) => toggleRoundedCorners(),
+            onChanged: isRoundedBorders == null
+                ? null
+                : (value) => toggleRoundedCorners(),
             secondary: const Icon(Icons.rounded_corner),
             title: const Text('Rounded corners'),
           ),
@@ -428,7 +431,9 @@ class _PrettyQrSettingsState extends State<_PrettyQrSettings> {
           value: widget.decoration.image != null,
           onChanged: (value) => toggleImage(),
           secondary: Icon(
-            widget.decoration.image != null ? Icons.image_outlined : Icons.hide_image_outlined,
+            widget.decoration.image != null
+                ? Icons.image_outlined
+                : Icons.hide_image_outlined,
           ),
           title: const Text('Image'),
         ),
