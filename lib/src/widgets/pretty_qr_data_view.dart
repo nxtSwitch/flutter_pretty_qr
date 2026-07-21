@@ -144,7 +144,9 @@ class _PrettyQrErrorWidget extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              const Positioned.fill(child: Placeholder(color: Color(0xCF8D021F))),
+              const Positioned.fill(
+                child: Placeholder(color: Color(0xCF8D021F)),
+              ),
               Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: FittedBox(
